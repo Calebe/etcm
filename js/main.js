@@ -10,6 +10,24 @@
   function isInput(elm) { return elm.nodeName !== undefined && elm.nodeName == 'INPUT'; }
   function isETCM() { return location.hostname == 'etcm'; }
 
+  function parseNum(tcNum) {
+    var text = tcNum;
+
+    while (text.length < tcNumLen)
+      text = paddingChar + text;
+
+    return text;
+  }
+
+  function parseYear(year) {
+    if (year.length == 4)
+      return year;
+
+    return (parseInt(year) < 50 ? '20' : '19') + year;
+  }
+
+  function buildTCNum(tcNum, tcYear) { return prefix + separator + tcNum + separator + tcYear; }
+
   function equipInput(input, submit) {
     if (!isInput(input))
       return;
@@ -32,32 +50,53 @@
   function parseContent(input) {
     var text = input.value;
     var textLen = text.length;
-    var tcYear = '';
+    var tcNum = '',
+        tcYear = '';
 
-    if (text.substring(0, 2) == prefix)
+    if (textLen == 14 || text.substring(0, 2) == prefix)
       return text;
 
-    tcYear = text.substring(textLen - 2, textLen);
-    tcYear = (parseInt(tcYear) < 50 ? '20': '19') + tcYear;
-    text = text.substring(0, textLen - 2);
+    if (text.indexOf(separator) !== -1)
+      return parseDividedContent(input);
 
-    while (text.length < tcNumLen)
-      text = paddingChar + text;
+    tcYear = parseYear(text.substring(textLen - 2, textLen));
+    tcNum = parseNum(text.substring(0, textLen - 2));
 
-    return prefix + separator + text + separator + tcYear;
+    return buildTCNum(tcNum, tcYear);
   }
 
+  function parseDividedContent(input) {
+    var text = input.value,
+        values = text.split(separator),
+        tcNum = parseNum(values[0]),
+        tcYear = parseYear(values[1]);
+
+    return buildTCNum(tcNum, tcYear);
+  }
+
+  // Domain check.
   // if (!isETCM())
   //   return;
-
-  // Initial configuration.
   console.log('We\'re at eTCM.');
 
+  // Default bindings.
   $('#submit').on('click', function() {
     console.log('Submitting value: ' + $('#inp')[0].value);
   });
 
-  var input = $('#inp')[0];
+  $('#open_window').on('click', function() {
+    window.open('etcm.html', 'foo', 'menubar=no');
+  });
+
+  $('#close_window').on('click', function() {
+    window.close();
+  })
+
+  // Disables window.close().
+  window.close = function() { return false; }
+
+  // Initial setup.
+  var input = $('#input')[0];
   var submit = $('#submit')[0];
   equipInput(input, submit);
 })();
