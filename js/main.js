@@ -50,8 +50,6 @@
   function parseContent(input) {
     var text = input.value;
     var textLen = text.length;
-    var tcNum = '',
-        tcYear = '';
 
     if (textLen == 14 || text.substring(0, 2) == prefix)
       return text;
@@ -59,8 +57,8 @@
     if (text.indexOf(separator) !== -1)
       return parseDividedContent(input);
 
-    tcYear = parseYear(text.substring(textLen - 2, textLen));
-    tcNum = parseNum(text.substring(0, textLen - 2));
+    var tcYear = parseYear(text.substring(textLen - 2, textLen));
+    var tcNum = parseNum(text.substring(0, textLen - 2));
 
     return buildTCNum(tcNum, tcYear);
   }
@@ -81,7 +79,7 @@
 
   // Default bindings.
   $('#submit').on('click', function() {
-    console.log('Submitting value: ' + $('#inp')[0].value);
+    console.log('Submitting value: ' + $('#input')[0].value);
   });
 
   $('#open_window').on('click', function() {
@@ -99,4 +97,12 @@
   var input = $('#input')[0];
   var submit = $('#submit')[0];
   equipInput(input, submit);
+
+  // document.activeElement
+  // Debug.
+  $(input).keydown(function(e) {
+    console.log(e.key);
+  });
+
+
 })();
